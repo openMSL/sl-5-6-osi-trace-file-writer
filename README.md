@@ -4,7 +4,7 @@
 
 This [FMU](https://fmi-standard.org/) is able to write binary OSI SensorData trace files.
 The folder the trace files shall be written to has to be passed as FMI parameter _trace_path_.
-The trace file player is build according to the [ASAM Open simulation Interface (OSI)](https://github.com/OpenSimulationInterface/open-simulation-interface) and the [OSI Sensor Model Packaging (OSMP)](https://github.com/OpenSimulationInterface/osi-sensor-model-packaging) examples.
+The trace file writer is build according to the [ASAM Open simulation Interface (OSI)](https://github.com/OpenSimulationInterface/open-simulation-interface) and the [OSI Sensor Model Packaging (OSMP)](https://github.com/OpenSimulationInterface/osi-sensor-model-packaging) examples.
 
 ## Installation
 
@@ -25,7 +25,7 @@ sudo apt-get install libprotobuf-dev protobuf-compiler
 ### Clone with submodules
 
 ```bash
-git clone https://gitlab.com/persival-open-source/open-simulation-interface/osi-sensordata-trace-file-writer.git
+git clone https://github.com/Persival-GmbH/osi-sensordata-trace-file-writer.git
 cd osi-sensordata-trace-file-writer
 git submodule update --init
 ```
