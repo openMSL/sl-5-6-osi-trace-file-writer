@@ -222,11 +222,11 @@ class OSMP
     {
         boolean_vars_[FMI_BOOLEAN_VALID_IDX] = value;
     }
-    string fmi_trace_path()
+    string FmiTracePath()
     {
         return string_vars_[FMI_STRING_TRACE_PATH_IDX];
     }
-    void set_fmi_trace_path(string value)
+    void SetFmiTracePath(string value)
     {
         string_vars_[FMI_STRING_TRACE_PATH_IDX] = value;
     }

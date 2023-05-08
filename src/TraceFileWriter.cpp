@@ -32,7 +32,7 @@ osi3::SensorData TraceFileWriter::Step(osi3::SensorData sensor_data)
     std::string osi_msg_string_only = sensor_data.SerializeAsString();
     MessageSizeT message_size = osi_msg_string_only.size();
     char character[4];
-    memcpy(character, (char*)&message_size, sizeof(MessageSizeT));
+    memcpy(character, (char *) &message_size, sizeof(MessageSizeT));
 
     std::string osi_msg_string;
     osi_msg_string += character[0];
@@ -41,7 +41,7 @@ osi3::SensorData TraceFileWriter::Step(osi3::SensorData sensor_data)
     osi_msg_string += character[3];
     osi_msg_string += osi_msg_string_only;
 
-    bin_file.write(osi_msg_string.c_str(), osi_msg_string.length());
+    bin_file.write(osi_msg_string.c_str(), long(osi_msg_string.length()));
     bin_file.close();
     osi_msg_string.clear();
 
@@ -49,11 +49,11 @@ osi3::SensorData TraceFileWriter::Step(osi3::SensorData sensor_data)
 }
 void TraceFileWriter::SetFileName()
 {
-    time_t curr_time;
-    struct tm *detl;
+    time_t curr_time{};
+    struct tm *detl = nullptr;
     char buf[80];
-    time( &curr_time );
-    detl = localtime( &curr_time );
+    time(&curr_time);
+    detl = localtime(&curr_time);
     strftime(buf, 20, "%Y%m%dT%H%M%SZ", detl);
 
     std::string start_time = std::string(buf);
