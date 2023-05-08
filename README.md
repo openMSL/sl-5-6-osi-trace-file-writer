@@ -1,5 +1,6 @@
-OSI SensorDara Binary Trace File Writer
-===================================
+# OSI SensorDara Binary Trace File Writer
+
+[![Test Pipeline](https://github.com/Persival-GmbH/OSI-SensorData-Trace-File-Writer/actions/workflows/test_pipeline.yml/badge.svg)](https://github.com/Persival-GmbH/OSI-SensorData-Trace-File-Writer/actions/workflows/test_pipeline.yml)
 
 This [FMU](https://fmi-standard.org/) is able to write binary OSI SensorData trace files.
 The folder the trace files shall be written to has to be passed as FMI parameter _trace_path_.
