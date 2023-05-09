@@ -4,7 +4,17 @@
 
 This [FMU](https://fmi-standard.org/) is able to write binary OSI SensorData trace files.
 The folder the trace files shall be written to has to be passed as FMI parameter _trace_path_.
-The trace file writer is build according to the [ASAM Open simulation Interface (OSI)](https://github.com/OpenSimulationInterface/open-simulation-interface) and the [OSI Sensor Model Packaging (OSMP)](https://github.com/OpenSimulationInterface/osi-sensor-model-packaging) examples.
+The trace file writer is build according to
+the [ASAM Open simulation Interface (OSI)](https://github.com/OpenSimulationInterface/open-simulation-interface) and
+the [OSI Sensor Model Packaging (OSMP)](https://github.com/OpenSimulationInterface/osi-sensor-model-packaging) examples.
+
+## FMI Parameters
+
+| Parameter        | Description                                                                                                                                                                                                                                           |
+|------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| trace_path       | Path, where to put the generated trace file                                                                                                                                                                                                           |
+| protobuf_version | Protobuf version, with which the OSI messages are serialized as string, e.g. "2112" for v21.12 (see [Naming Convention](https://opensimulationinterface.github.io/osi-antora-generator/asamosi/latest/interface/architecture/trace_file_naming.html)) |
+| custom_name      | Custom name as a suffix for the trace file name (see [Naming Convention](https://opensimulationinterface.github.io/osi-antora-generator/asamosi/latest/interface/architecture/trace_file_naming.html)                                                 |
 
 ## Installation
 
