@@ -157,7 +157,7 @@ fmi2Status OSMP::DoEnterInitializationMode()
 
 fmi2Status OSMP::DoExitInitializationMode()
 {
-    trace_file_writer_.Init(FmiTracePath());
+    trace_file_writer_.Init(FmiTracePath(), FmiProtobufVersion(), FmiCustomName());
 
     return fmi2OK;
 }
@@ -182,6 +182,7 @@ fmi2Status OSMP::DoCalc(fmi2Real current_communication_point, fmi2Real communica
 
 fmi2Status OSMP::DoTerm()
 {
+    trace_file_writer_.Term();
     return fmi2OK;
 }
 

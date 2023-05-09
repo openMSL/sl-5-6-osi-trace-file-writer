@@ -51,6 +51,12 @@
     <ScalarVariable name="trace_path" valueReference="0" causality="parameter" variability="fixed">
       <String start=""/>
     </ScalarVariable>
+    <ScalarVariable name="protobuf_version" valueReference="1" causality="parameter" variability="fixed">
+      <String start=""/>
+    </ScalarVariable>
+    <ScalarVariable name="custom_name" valueReference="2" causality="parameter" variability="fixed">
+      <String start=""/>
+    </ScalarVariable>
   </ModelVariables>
   <ModelStructure>
     <Outputs>
