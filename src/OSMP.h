@@ -56,7 +56,9 @@
 
 /* String Variables */
 #define FMI_STRING_TRACE_PATH_IDX 0
-#define FMI_STRING_LAST_IDX FMI_STRING_TRACE_PATH_IDX
+#define FMI_STRING_PROTOBUF_VERSION_IDX 1
+#define FMI_STRING_CUSTOM_NAME_IDX 2
+#define FMI_STRING_LAST_IDX FMI_STRING_CUSTOM_NAME_IDX
 #define FMI_STRING_VARS (FMI_STRING_LAST_IDX+1)
 
 #include <cstdarg>
@@ -229,6 +231,14 @@ class OSMP
     void SetFmiTracePath(string value)
     {
         string_vars_[FMI_STRING_TRACE_PATH_IDX] = value;
+    }
+    string FmiProtobufVersion()
+    {
+        return string_vars_[FMI_STRING_PROTOBUF_VERSION_IDX];
+    }
+    string FmiCustomName()
+    {
+        return string_vars_[FMI_STRING_CUSTOM_NAME_IDX];
     }
 
     /* Protocol Buffer Accessors */
