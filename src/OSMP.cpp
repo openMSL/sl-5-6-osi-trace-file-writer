@@ -182,6 +182,7 @@ fmi2Status OSMP::DoCalc(fmi2Real current_communication_point, fmi2Real communica
 
 fmi2Status OSMP::DoTerm()
 {
+    trace_file_writer_.Term();
     return fmi2OK;
 }
 

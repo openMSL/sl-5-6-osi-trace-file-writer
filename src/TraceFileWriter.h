@@ -15,11 +15,16 @@ class TraceFileWriter
   public:
     void Init(std::string trace_path);
     osi3::SensorData Step(osi3::SensorData sensor_data);
+    void Term();
 
   private:
 
     std::string trace_path_;
     std::string trace_file_name_;
+    std::string start_time;
+    int num_frames_ = 0;
+    std::string osi_version_;
+    std::string protobuf_version_ = "2112";
 
     void SetFileName();
 
