@@ -33,8 +33,8 @@ sudo apt-get install libprotobuf-dev protobuf-compiler
 ### Clone with submodules
 
 ```bash
-git clone https://github.com/Persival-GmbH/osi-sensordata-trace-file-writer.git
-cd osi-sensordata-trace-file-writer
+git clone https://github.com/openMSL/sl-5-6-osi-trace-file-writer.git
+cd sl-5-6-osi-trace-file-writer
 git submodule update --init
 ```
 
