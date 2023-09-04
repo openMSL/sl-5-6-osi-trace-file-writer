@@ -1,7 +1,7 @@
 cmake_policy(SET CMP0048 NEW)
 cmake_minimum_required(VERSION 3.12)
 
-project(osi-sensordata-trace-file-writer)
+project(osi-trace-file-writer)
 
 add_subdirectory(lib/open-simulation-interface)
 get_directory_property(OSI_VERSION_MAJOR DIRECTORY lib/open-simulation-interface DEFINITION VERSION_MAJOR)
