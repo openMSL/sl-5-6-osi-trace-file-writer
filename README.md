@@ -1,4 +1,4 @@
-# OSI SensorData Binary Trace File Writer
+# SL-5-6 OSI Trace File Writer
 
 [![Test Pipeline](https://github.com/Persival-GmbH/OSI-SensorData-Trace-File-Writer/actions/workflows/test_pipeline.yml/badge.svg)](https://github.com/Persival-GmbH/OSI-SensorData-Trace-File-Writer/actions/workflows/test_pipeline.yml)
 

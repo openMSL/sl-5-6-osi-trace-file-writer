@@ -9,17 +9,17 @@ string(MD5 FMUGUID modelDescription.in.xml)
 configure_file(modelDescription.in.xml modelDescription.xml @ONLY)
 
 find_package(Protobuf 2.6.1 REQUIRED)
-add_library(osi-sensordata-trace-file-writer SHARED
+add_library(osi-trace-file-writer SHARED
 		OSMP.cpp
 		OSMP.h
 		TraceFileWriter.cpp
 		TraceFileWriter.h)
-set_target_properties(osi-sensordata-trace-file-writer PROPERTIES PREFIX "")
-target_compile_definitions(osi-sensordata-trace-file-writer PRIVATE "FMU_SHARED_OBJECT")
+set_target_properties(osi-trace-file-writer PROPERTIES PREFIX "")
+target_compile_definitions(osi-trace-file-writer PRIVATE "FMU_SHARED_OBJECT")
 if(LINK_WITH_SHARED_OSI)
-	target_link_libraries(osi-sensordata-trace-file-writer open_simulation_interface)
+	target_link_libraries(osi-trace-file-writer open_simulation_interface)
 else()
-	target_link_libraries(osi-sensordata-trace-file-writer open_simulation_interface_pic)
+	target_link_libraries(osi-trace-file-writer open_simulation_interface_pic)
 endif()
 
 if(WIN32)
@@ -42,7 +42,7 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	endif()
 endif()
 
-add_custom_command(TARGET osi-sensordata-trace-file-writer
+add_custom_command(TARGET osi-trace-file-writer
 		POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_CURRENT_BINARY_DIR}/buildfmu"
 		COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/buildfmu/sources"
@@ -52,5 +52,5 @@ add_custom_command(TARGET osi-sensordata-trace-file-writer
 		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/OSMP.h" "${CMAKE_CURRENT_BINARY_DIR}/buildfmu/sources/"
 		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/TraceFileWriter.cpp" "${CMAKE_CURRENT_BINARY_DIR}/buildfmu/sources/"
 		COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/TraceFileWriter.h" "${CMAKE_CURRENT_BINARY_DIR}/buildfmu/sources/"
-		COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:osi-sensordata-trace-file-writer> $<$<PLATFORM_ID:Windows>:$<$<CONFIG:Debug>:$<TARGET_PDB_FILE:osi-sensordata-trace-file-writer>>> "${CMAKE_CURRENT_BINARY_DIR}/buildfmu/binaries/${FMI_BINARIES_PLATFORM}"
-		COMMAND ${CMAKE_COMMAND} -E chdir "${CMAKE_CURRENT_BINARY_DIR}/buildfmu" ${CMAKE_COMMAND} -E tar "cfv" "${FMU_INSTALL_DIR}/osi-sensordata-trace-file-writer.fmu" --format=zip "modelDescription.xml" "${CMAKE_CURRENT_BINARY_DIR}/buildfmu/sources" "${CMAKE_CURRENT_BINARY_DIR}/buildfmu/binaries/${FMI_BINARIES_PLATFORM}")
+		COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:osi-trace-file-writer> $<$<PLATFORM_ID:Windows>:$<$<CONFIG:Debug>:$<TARGET_PDB_FILE:osi-trace-file-writer>>> "${CMAKE_CURRENT_BINARY_DIR}/buildfmu/binaries/${FMI_BINARIES_PLATFORM}"
+		COMMAND ${CMAKE_COMMAND} -E chdir "${CMAKE_CURRENT_BINARY_DIR}/buildfmu" ${CMAKE_COMMAND} -E tar "cfv" "${FMU_INSTALL_DIR}/osi-trace-file-writer.fmu" --format=zip "modelDescription.xml" "${CMAKE_CURRENT_BINARY_DIR}/buildfmu/sources" "${CMAKE_CURRENT_BINARY_DIR}/buildfmu/binaries/${FMI_BINARIES_PLATFORM}")
