@@ -58,7 +58,8 @@
 #define FMI_STRING_TRACE_PATH_IDX 0
 #define FMI_STRING_PROTOBUF_VERSION_IDX 1
 #define FMI_STRING_CUSTOM_NAME_IDX 2
-#define FMI_STRING_LAST_IDX FMI_STRING_CUSTOM_NAME_IDX
+#define FMI_STRING_TYPE_IDX 3
+#define FMI_STRING_LAST_IDX FMI_STRING_TYPE_IDX
 #define FMI_STRING_VARS (FMI_STRING_LAST_IDX+1)
 
 #include <cstdarg>
@@ -240,8 +241,11 @@ class OSMP
     {
         return string_vars_[FMI_STRING_CUSTOM_NAME_IDX];
     }
+    string FmiType()
+    {
+        return string_vars_[FMI_STRING_TYPE_IDX];
+    }
 
     /* Protocol Buffer Accessors */
     bool GetFmiSensorDataIn(osi3::SensorData &data);
-
 };

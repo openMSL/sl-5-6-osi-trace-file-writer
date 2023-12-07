@@ -3,7 +3,7 @@
   fmiVersion="2.0"
   modelName="osi-trace-file-writer"
   guid="@FMUGUID@"
-  description="Write binary OSI SensorData trace files"
+  description="Write binary OSI trace files"
   author="Persival GmbH"
   version="@OSMPVERSION@"
   generationTool="manual"
@@ -56,6 +56,9 @@
     </ScalarVariable>
     <ScalarVariable name="custom_name" valueReference="2" causality="parameter" variability="fixed">
       <String start=""/>
+    </ScalarVariable>
+    <ScalarVariable name="type" valueReference="3" causality="parameter" variability="fixed">
+      <String start="sd"/>
     </ScalarVariable>
   </ModelVariables>
   <ModelStructure>

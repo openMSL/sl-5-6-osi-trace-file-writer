@@ -157,7 +157,7 @@ fmi2Status OSMP::DoEnterInitializationMode()
 
 fmi2Status OSMP::DoExitInitializationMode()
 {
-    trace_file_writer_.Init(FmiTracePath(), FmiProtobufVersion(), FmiCustomName());
+    trace_file_writer_.Init(FmiTracePath(), FmiProtobufVersion(), FmiCustomName(), FmiType());
 
     return fmi2OK;
 }

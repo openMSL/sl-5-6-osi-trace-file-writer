@@ -10,19 +10,21 @@
 #include <ctime>
 #include <fstream>
 #include <iostream>
+#include <utility>
 
 #include "osi_sensordata.pb.h"
 #include "osi_sensorview.pb.h"
 
-void TraceFileWriter::Init(std::string trace_path, std::string protobuf_version, std::string custom_name)
+void TraceFileWriter::Init(std::string trace_path, std::string protobuf_version, std::string custom_name, std::string type)
 {
     trace_path_ = std::move(trace_path);
     if (!trace_path_.empty() && trace_path_.back() != '/')
     {
         trace_path_ += '/';
     }
-    protobuf_version_ = protobuf_version;
-    custom_name_ = custom_name;
+    protobuf_version_ = std::move(protobuf_version);
+    custom_name_ = std::move(custom_name);
+    type_ = std::move(type);
     SetFileName();
 }
 
@@ -62,12 +64,12 @@ void TraceFileWriter::SetFileName()
 
     start_time_ = std::string(buf);
 
-    trace_file_name_ = start_time_ + "_sd_tmp.osi";
+    trace_file_name_ = start_time_ + "_" + type_ + "_tmp.osi";
 }
 void TraceFileWriter::Term()
 {
     std::string filename_tmp = trace_path_ + trace_file_name_;
-    std::string filename_final = trace_path_ + start_time_ + "_sd_" + osi_version_ + "_" + protobuf_version_ + "_" + std::to_string(num_frames_);
+    std::string filename_final = trace_path_ + start_time_ + "_" + type_ + "_" + osi_version_ + "_" + protobuf_version_ + "_" + std::to_string(num_frames_);
     if (!custom_name_.empty())
     {
         filename_final += "_" + custom_name_;
