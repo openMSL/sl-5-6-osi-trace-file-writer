@@ -1,5 +1,8 @@
 cmake_policy(SET CMP0048 NEW)
 cmake_minimum_required(VERSION 3.12)
+if(NOT (CMAKE_BUILD_TYPE OR DEFINED ENV{CMAKE_BUILD_TYPE}))
+    set(CMAKE_BUILD_TYPE "Release")
+endif()
 
 project(osi-trace-file-writer)
 

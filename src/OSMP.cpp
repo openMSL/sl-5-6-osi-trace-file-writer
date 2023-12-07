@@ -101,11 +101,11 @@ void EncodePointerToInteger(const void *ptr, fmi2Integer &hi, fmi2Integer &lo)
 
 bool OSMP::GetFmiSensorDataIn(osi3::SensorData &data)
 {
-    if (integer_vars_[FMI_INTEGER_SENSORDATA_IN_SIZE_IDX] > 0)
+    if (integer_vars_[FMI_INTEGER_OSI_IN_SIZE_IDX] > 0)
     {
-        void *buffer = DecodeIntegerToPointer(integer_vars_[FMI_INTEGER_SENSORDATA_IN_BASEHI_IDX], integer_vars_[FMI_INTEGER_SENSORDATA_IN_BASELO_IDX]);
-        NormalLog("OSMP", "Got %08X %08X, reading from %p ...", integer_vars_[FMI_INTEGER_SENSORDATA_IN_BASEHI_IDX], integer_vars_[FMI_INTEGER_SENSORDATA_IN_BASELO_IDX], buffer);
-        data.ParseFromArray(buffer, integer_vars_[FMI_INTEGER_SENSORDATA_IN_SIZE_IDX]);
+        void *buffer = DecodeIntegerToPointer(integer_vars_[FMI_INTEGER_OSI_IN_BASEHI_IDX], integer_vars_[FMI_INTEGER_OSI_IN_BASELO_IDX]);
+        NormalLog("OSMP", "Got %08X %08X, reading from %p ...", integer_vars_[FMI_INTEGER_OSI_IN_BASEHI_IDX], integer_vars_[FMI_INTEGER_OSI_IN_BASELO_IDX], buffer);
+        data.ParseFromArray(buffer, integer_vars_[FMI_INTEGER_OSI_IN_SIZE_IDX]);
         return true;
     }
     return false;
@@ -157,7 +157,7 @@ fmi2Status OSMP::DoEnterInitializationMode()
 
 fmi2Status OSMP::DoExitInitializationMode()
 {
-    trace_file_writer_.Init(FmiTracePath(), FmiProtobufVersion(), FmiCustomName());
+    trace_file_writer_.Init(FmiTracePath(), FmiProtobufVersion(), FmiCustomName(), FmiType());
 
     return fmi2OK;
 }
