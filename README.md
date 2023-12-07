@@ -15,7 +15,6 @@ the [OSI Sensor Model Packaging (OSMP)](https://github.com/OpenSimulationInterfa
 | custom_name      | Custom name as a suffix for the trace file name (see [Naming Convention](https://opensimulationinterface.github.io/osi-antora-generator/asamosi/latest/interface/architecture/trace_file_naming.html))                                                |
 | type             | OSI message type string according to the [Naming Convention](https://opensimulationinterface.github.io/osi-antora-generator/asamosi/latest/interface/architecture/trace_file_naming.html)                                                             |
 
-
 ## Installation
 
 ### Dependencies
