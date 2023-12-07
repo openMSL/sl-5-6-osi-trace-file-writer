@@ -12,7 +12,9 @@ the [OSI Sensor Model Packaging (OSMP)](https://github.com/OpenSimulationInterfa
 |------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | trace_path       | Path, where to put the generated trace file                                                                                                                                                                                                           |
 | protobuf_version | Protobuf version, with which the OSI messages are serialized as string, e.g. "2112" for v21.12 (see [Naming Convention](https://opensimulationinterface.github.io/osi-antora-generator/asamosi/latest/interface/architecture/trace_file_naming.html)) |
-| custom_name      | Custom name as a suffix for the trace file name (see [Naming Convention](https://opensimulationinterface.github.io/osi-antora-generator/asamosi/latest/interface/architecture/trace_file_naming.html)                                                 |
+| custom_name      | Custom name as a suffix for the trace file name (see [Naming Convention](https://opensimulationinterface.github.io/osi-antora-generator/asamosi/latest/interface/architecture/trace_file_naming.html))                                                |
+| type             | OSI message type string according to the [Naming Convention](https://opensimulationinterface.github.io/osi-antora-generator/asamosi/latest/interface/architecture/trace_file_naming.html)                                                             |
+
 
 ## Installation
 
