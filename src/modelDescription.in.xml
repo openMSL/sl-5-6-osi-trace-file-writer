@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <fmiModelDescription
   fmiVersion="2.0"
-  modelName="osi-trace-file-writer"
+  modelName="sl-5-6-osi-trace-file-writer"
   guid="@FMUGUID@"
   description="Write binary OSI trace files"
   author="Persival GmbH"
@@ -10,7 +10,7 @@
   generationDateAndTime="@FMUTIMESTAMP@"
   variableNamingConvention="structured">
   <CoSimulation
-    modelIdentifier="osi-trace-file-writer"
+    modelIdentifier="sl-5-6-osi-trace-file-writer"
     canHandleVariableCommunicationStepSize="true"
     canNotUseMemoryManagementFunctions="true">
     <SourceFiles>
