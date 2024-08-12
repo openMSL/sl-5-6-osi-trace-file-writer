@@ -4,7 +4,9 @@ if(NOT (CMAKE_BUILD_TYPE OR DEFINED ENV{CMAKE_BUILD_TYPE}))
     set(CMAKE_BUILD_TYPE "Release")
 endif()
 
-project(osi-trace-file-writer)
+project(sl-5-6-osi-trace-file-writer)
+
+set(OSMPVERSION "1.2.0" CACHE STRING "OSMP Version String")
 
 add_subdirectory(lib/open-simulation-interface)
 get_directory_property(OSI_VERSION_MAJOR DIRECTORY lib/open-simulation-interface DEFINITION VERSION_MAJOR)
