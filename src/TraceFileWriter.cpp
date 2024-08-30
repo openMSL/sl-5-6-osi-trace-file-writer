@@ -30,9 +30,8 @@ void TraceFileWriter::Init(std::string trace_path, std::string protobuf_version,
 osi3::SensorData TraceFileWriter::Step(osi3::SensorData sensor_data)
 {
     num_frames_++;
-    osi_version_ = std::to_string(sensor_data.version().version_major()) +
-                   std::to_string(sensor_data.version().version_minor()) +
-                   std::to_string(sensor_data.version().version_patch());
+    osi_version_ =
+        std::to_string(sensor_data.version().version_major()) + std::to_string(sensor_data.version().version_minor()) + std::to_string(sensor_data.version().version_patch());
     typedef unsigned int MessageSizeT;
     std::ofstream bin_file(trace_path_ + trace_file_name_, std::ios::binary | std::ios_base::app);
 
