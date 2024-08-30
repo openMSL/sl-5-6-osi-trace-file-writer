@@ -9,7 +9,6 @@
 
 #include <ctime>
 #include <fstream>
-#include <iostream>
 #include <utility>
 
 #include "osi_sensordata.pb.h"
@@ -53,6 +52,7 @@ osi3::SensorData TraceFileWriter::Step(osi3::SensorData sensor_data)
 
     return sensor_data;
 }
+
 void TraceFileWriter::SetFileName()
 {
     time_t curr_time{};
@@ -64,8 +64,15 @@ void TraceFileWriter::SetFileName()
 
     start_time_ = std::string(buf);
 
-    trace_file_name_ = start_time_ + "_" + type_ + "_tmp.osi";
+    trace_file_name_ = start_time_ + "_" + type_;
+    if (!custom_name_.empty())
+    {
+        trace_file_name_ += "_" + custom_name_;
+    }
+    trace_file_name_ += ".osi";
+
 }
+
 void TraceFileWriter::Term()
 {
     std::string filename_tmp = trace_path_ + trace_file_name_;
