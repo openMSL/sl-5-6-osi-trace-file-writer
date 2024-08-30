@@ -30,14 +30,16 @@ void TraceFileWriter::Init(std::string trace_path, std::string protobuf_version,
 osi3::SensorData TraceFileWriter::Step(osi3::SensorData sensor_data)
 {
     num_frames_++;
-    osi_version_ = std::to_string(sensor_data.version().version_major()) + std::to_string(sensor_data.version().version_minor()) + std::to_string(sensor_data.version().version_patch());
+    osi_version_ = std::to_string(sensor_data.version().version_major()) +
+                   std::to_string(sensor_data.version().version_minor()) +
+                   std::to_string(sensor_data.version().version_patch());
     typedef unsigned int MessageSizeT;
     std::ofstream bin_file(trace_path_ + trace_file_name_, std::ios::binary | std::ios_base::app);
 
     std::string osi_msg_string_only = sensor_data.SerializeAsString();
     MessageSizeT message_size = osi_msg_string_only.size();
     char character[4];
-    memcpy(character, (char *) &message_size, sizeof(MessageSizeT));
+    memcpy(character, (char*)&message_size, sizeof(MessageSizeT));
 
     std::string osi_msg_string;
     osi_msg_string += character[0];
@@ -56,10 +58,9 @@ osi3::SensorData TraceFileWriter::Step(osi3::SensorData sensor_data)
 void TraceFileWriter::SetFileName()
 {
     time_t curr_time{};
-    struct tm *detl = nullptr;
     char buf[80];
     time(&curr_time);
-    detl = localtime(&curr_time);
+    struct tm* detl = localtime(&curr_time);
     strftime(buf, 20, "%Y%m%dT%H%M%SZ", detl);
 
     start_time_ = std::string(buf);
@@ -70,7 +71,6 @@ void TraceFileWriter::SetFileName()
         trace_file_name_ += "_" + custom_name_;
     }
     trace_file_name_ += ".osi";
-
 }
 
 void TraceFileWriter::Term()
@@ -84,4 +84,3 @@ void TraceFileWriter::Term()
     filename_final += ".osi";
     std::rename(filename_tmp.c_str(), filename_final.c_str());
 }
-
