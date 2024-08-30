@@ -48,7 +48,7 @@ osi3::SensorData TraceFileWriter::Step(osi3::SensorData sensor_data)
     osi_msg_string += character[3];
     osi_msg_string += osi_msg_string_only;
 
-    bin_file.write(osi_msg_string.c_str(), long(osi_msg_string.length()));
+    bin_file.write(osi_msg_string.c_str(), static_cast<long>(osi_msg_string.length()));
     bin_file.close();
     osi_msg_string.clear();
 
@@ -60,8 +60,8 @@ void TraceFileWriter::SetFileName()
     time_t curr_time{};
     char buf[80];
     time(&curr_time);
-    struct tm* detl = localtime(&curr_time);
-    strftime(buf, 20, "%Y%m%dT%H%M%SZ", detl);
+    const tm* date_time = localtime(&curr_time);
+    strftime(buf, 20, "%Y%m%dT%H%M%SZ", date_time);
 
     start_time_ = std::string(buf);
 
@@ -75,7 +75,7 @@ void TraceFileWriter::SetFileName()
 
 void TraceFileWriter::Term()
 {
-    std::string filename_tmp = trace_path_ + trace_file_name_;
+    const std::string filename_tmp = trace_path_ + trace_file_name_;
     std::string filename_final = trace_path_ + start_time_ + "_" + type_ + "_" + osi_version_ + "_" + protobuf_version_ + "_" + std::to_string(num_frames_);
     if (!custom_name_.empty())
     {
