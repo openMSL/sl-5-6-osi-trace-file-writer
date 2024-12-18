@@ -187,9 +187,6 @@ fmi2Status OSMP::DoExitInitializationMode()
 
 fmi2Status OSMP::DoCalc(fmi2Real current_communication_point, fmi2Real communication_step_size, fmi2Boolean no_set_fmu_state_prior_to_current_pointfmi_2_component)
 {
-
-    osi3::SensorData current_in;
-
     if (const void* buffer = DecodeIntegerToPointer(integer_vars_[FMI_INTEGER_OSI_IN_BASEHI_IDX], integer_vars_[FMI_INTEGER_OSI_IN_BASELO_IDX]);
         !trace_file_writer_.Step(buffer, integer_vars_[FMI_INTEGER_OSI_IN_SIZE_IDX]))
     {
