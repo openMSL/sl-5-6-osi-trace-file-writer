@@ -1,6 +1,6 @@
 # SL-5-6 OSI Trace File Writer
 
-This OSI Trace File Writer is a [FMU](https://fmi-standard.org/) designed to generate trace files from multiple OSI message types including `SensorData`, `SensorView`, and `GroundTruth`. 
+This OSI Trace File Writer is a [FMU](https://fmi-standard.org/) designed to generate trace files from multiple OSI message types including `SensorData`, `SensorView`, and `GroundTruth`.
 It offers different output format options to meet various needs.
 
 The trace file writer is build according to
@@ -16,7 +16,6 @@ the [OSI Sensor Model Packaging (OSMP)](https://github.com/OpenSimulationInterfa
 | custom_name      | Custom name as a suffix for the trace file name (see [Naming Convention](https://opensimulationinterface.github.io/osi-antora-generator/asamosi/latest/interface/architecture/trace_file_naming.html))                                                                    |
 | message_type     | OSI message type string according to the [Naming Convention](https://opensimulationinterface.github.io/osi-antora-generator/asamosi/latest/interface/architecture/trace_file_naming.html). <br>Currently supports: SensorData (sd), SensorView (sv), and GroundTruth (gt) |
 | file_format      | Format of the output trace file. Allowed values: mcap, osi, or txth                                                                                                                                                                                                      |
-
 
 ## Installation
 
