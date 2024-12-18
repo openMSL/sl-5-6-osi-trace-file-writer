@@ -1,4 +1,4 @@
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(LINK_WITH_SHARED_OSI OFF CACHE BOOL "Link FMU with shared OSI library instead of statically linking")
 set(PUBLIC_LOGGING OFF CACHE BOOL "Enable logging via FMI logger")
@@ -21,6 +21,8 @@ if(LINK_WITH_SHARED_OSI)
 else()
 	target_link_libraries(sl-5-6-osi-trace-file-writer open_simulation_interface_pic)
 endif()
+
+target_link_libraries(sl-5-6-osi-trace-file-writer OSIUtilities)
 
 if(WIN32)
 	if(CMAKE_SIZEOF_VOID_P EQUAL 8)

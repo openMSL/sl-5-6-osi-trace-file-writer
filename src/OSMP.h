@@ -58,8 +58,9 @@
 #define FMI_STRING_TRACE_PATH_IDX 0
 #define FMI_STRING_PROTOBUF_VERSION_IDX 1
 #define FMI_STRING_CUSTOM_NAME_IDX 2
-#define FMI_STRING_TYPE_IDX 3
-#define FMI_STRING_LAST_IDX FMI_STRING_TYPE_IDX
+#define FMI_STRING_MESSAGE_TYPE_IDX 3
+#define FMI_STRING_FILE_FORMAT_IDX 4
+#define FMI_STRING_LAST_IDX FMI_STRING_FILE_FORMAT_IDX
 #define FMI_STRING_VARS (FMI_STRING_LAST_IDX+1)
 
 #include <cstdarg>
@@ -241,9 +242,13 @@ class OSMP
     {
         return string_vars_[FMI_STRING_CUSTOM_NAME_IDX];
     }
-    string FmiType()
+    string FmiMessageType()
     {
-        return string_vars_[FMI_STRING_TYPE_IDX];
+        return string_vars_[FMI_STRING_MESSAGE_TYPE_IDX];
+    }
+    string FmiFileFormat()
+    {
+        return string_vars_[FMI_STRING_FILE_FORMAT_IDX];
     }
 
     /* Protocol Buffer Accessors */

@@ -157,7 +157,30 @@ fmi2Status OSMP::DoEnterInitializationMode()
 
 fmi2Status OSMP::DoExitInitializationMode()
 {
-    trace_file_writer_.Init(FmiTracePath(), FmiProtobufVersion(), FmiCustomName(), FmiType());
+    // get file format from parameter
+    const std::map<std::string, FileFormat> FORMAT_MAP = {
+        {"osi", FileFormat::OSI},
+        {"mcap", FileFormat::MCAP},
+        {"txth", FileFormat::TXTH}
+    };
+
+    // Get lowercase format string
+    std::string file_format_parameter = FmiFileFormat();
+    std::transform(file_format_parameter.begin(), file_format_parameter.end(),
+                   file_format_parameter.begin(), ::tolower);
+
+    // Remove leading dot if present
+    if (!file_format_parameter.empty() && file_format_parameter[0] == '.') {
+        file_format_parameter.erase(0, 1);
+    }
+
+    // determine format using map
+    const auto format_map_it = FORMAT_MAP.find(file_format_parameter);
+    if (format_map_it == FORMAT_MAP.end()) {
+        std::cerr << "Unknown trace file format: " << FmiFileFormat() << std::endl;
+        return fmi2Error;
+    }
+    trace_file_writer_.Init(FmiTracePath(), FmiProtobufVersion(), FmiCustomName(), FmiMessageType(), format_map_it->second); // TODO change
 
     return fmi2OK;
 }
@@ -166,17 +189,15 @@ fmi2Status OSMP::DoCalc(fmi2Real current_communication_point, fmi2Real communica
 {
 
     osi3::SensorData current_in;
-    if (GetFmiSensorDataIn(current_in))
+
+    if (const void* buffer = DecodeIntegerToPointer(integer_vars_[FMI_INTEGER_OSI_IN_BASEHI_IDX], integer_vars_[FMI_INTEGER_OSI_IN_BASELO_IDX]);
+        !trace_file_writer_.Step(buffer, integer_vars_[FMI_INTEGER_OSI_IN_SIZE_IDX]))
     {
-        osi3::SensorData current_out = trace_file_writer_.Step(current_in);
-        /* Serialize */
-        SetFmiValid(1);
-    } else
-    {
-        /* We have no valid input, so no valid output */
-        NormalLog("OSI", "No valid input, therefore providing no valid output.");
         SetFmiValid(0);
+        NormalLog("OSI", "Could not write to trace file.");
+        return fmi2Error;
     }
+    SetFmiValid(1);
     return fmi2OK;
 }
 

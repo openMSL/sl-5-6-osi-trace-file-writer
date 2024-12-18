@@ -31,12 +31,17 @@ Install `protobuf` (at least version 3.0.0):
 sudo apt-get install libprotobuf-dev protobuf-compiler
 ```
 
+Install `libzstd` and `liblz4`:
+
+```bash
+sudo apt-get install libzstd-dev liblz4-dev
+```
+
 ### Clone with submodules
 
 ```bash
-git clone https://github.com/openMSL/sl-5-6-osi-trace-file-writer.git
+git clone --recurse-submodules https://github.com/openMSL/sl-5-6-osi-trace-file-writer.git
 cd sl-5-6-osi-trace-file-writer
-git submodule update --init
 ```
 
 ### Build

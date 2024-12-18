@@ -57,8 +57,11 @@
     <ScalarVariable name="custom_name" valueReference="2" causality="parameter" variability="fixed">
       <String start=""/>
     </ScalarVariable>
-    <ScalarVariable name="type" valueReference="3" causality="parameter" variability="fixed">
+    <ScalarVariable name="message_type" valueReference="3" causality="parameter" variability="fixed">
       <String start="sd"/>
+    </ScalarVariable>
+    <ScalarVariable name="file_format" valueReference="4" causality="parameter" variability="fixed">
+      <String start="osi"/>
     </ScalarVariable>
   </ModelVariables>
   <ModelStructure>
