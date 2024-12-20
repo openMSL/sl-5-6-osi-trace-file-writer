@@ -158,14 +158,12 @@ fmi2Status OSMP::DoEnterInitializationMode()
 fmi2Status OSMP::DoExitInitializationMode()
 {
     // get file format from parameter
-    const std::map<std::string, FileFormat> FORMAT_MAP = {
-        {"osi", FileFormat::OSI},
-        {"mcap", FileFormat::MCAP},
-        {"txth", FileFormat::TXTH}
-    };
-
-    // Get lowercase format string
     std::string file_format_parameter = FmiFileFormat();
+    if (file_format_parameter.empty()) {
+        NormalLog("OSI","No file format specified, assuming .osi as default");
+        file_format_parameter = "osi";
+    }
+    // Get lowercase format string
     std::transform(file_format_parameter.begin(), file_format_parameter.end(),
                    file_format_parameter.begin(), ::tolower);
 
@@ -175,12 +173,17 @@ fmi2Status OSMP::DoExitInitializationMode()
     }
 
     // determine format using map
+    const std::map<std::string, FileFormat> FORMAT_MAP = {
+        {"osi", FileFormat::OSI},
+        {"mcap", FileFormat::MCAP},
+        {"txth", FileFormat::TXTH}
+    };
     const auto format_map_it = FORMAT_MAP.find(file_format_parameter);
     if (format_map_it == FORMAT_MAP.end()) {
         std::cerr << "Unknown trace file format: " << FmiFileFormat() << std::endl;
         return fmi2Error;
     }
-    trace_file_writer_.Init(FmiTracePath(), FmiProtobufVersion(), FmiCustomName(), FmiMessageType(), format_map_it->second); // TODO change
+    trace_file_writer_.Init(FmiTracePath(), FmiProtobufVersion(), FmiCustomName(), FmiMessageType(), format_map_it->second);
 
     return fmi2OK;
 }
