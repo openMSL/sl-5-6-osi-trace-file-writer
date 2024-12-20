@@ -13,9 +13,9 @@ jobs:
 
     steps:
     - name: Checkout Model
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
-        submodules: true
+        submodules: recursive
 
     - name: Cache Dependencies
       id: cache-depends
@@ -37,6 +37,11 @@ jobs:
       working-directory: protobuf-21.12
       run: sudo make install && sudo ldconfig
 
+    - name: Install `libzstd` and `liblz4`
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libzstd-dev liblz4-dev
+
     - name: Prepare C++ Build
       run: mkdir build
 
@@ -48,3 +53,8 @@ jobs:
       working-directory: build
       run: cmake --build .
 
+    - name: Upload FMU Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: sl-5-6-osi-trace-file-writer.fmu
+        path: build/sl-5-6-osi-trace-file-writer.fmu

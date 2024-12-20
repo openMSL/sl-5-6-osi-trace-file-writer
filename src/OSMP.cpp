@@ -54,7 +54,7 @@ ofstream COSMPDummySensor::private_log_file;
  * ProtocolBuffer Accessors
  */
 
-void *DecodeIntegerToPointer(fmi2Integer hi, fmi2Integer lo)
+void* DecodeIntegerToPointer(fmi2Integer hi, fmi2Integer lo)
 {
 #if PTRDIFF_MAX == INT64_MAX
     union Addrconv
@@ -68,7 +68,7 @@ void *DecodeIntegerToPointer(fmi2Integer hi, fmi2Integer lo)
     } myaddr;
     myaddr.base.lo = lo;
     myaddr.base.hi = hi;
-    return reinterpret_cast<void *>(myaddr.address);
+    return reinterpret_cast<void*>(myaddr.address);
 #elif PTRDIFF_MAX == INT32_MAX
     return reinterpret_cast<void*>(lo);
 #else
@@ -76,7 +76,7 @@ void *DecodeIntegerToPointer(fmi2Integer hi, fmi2Integer lo)
 #endif
 }
 
-void EncodePointerToInteger(const void *ptr, fmi2Integer &hi, fmi2Integer &lo)
+void EncodePointerToInteger(const void* ptr, fmi2Integer& hi, fmi2Integer& lo)
 {
 #if PTRDIFF_MAX == INT64_MAX
     union Addrconv
@@ -99,11 +99,11 @@ void EncodePointerToInteger(const void *ptr, fmi2Integer &hi, fmi2Integer &lo)
 #endif
 }
 
-bool OSMP::GetFmiSensorDataIn(osi3::SensorData &data)
+bool OSMP::GetFmiSensorDataIn(osi3::SensorData& data)
 {
     if (integer_vars_[FMI_INTEGER_OSI_IN_SIZE_IDX] > 0)
     {
-        void *buffer = DecodeIntegerToPointer(integer_vars_[FMI_INTEGER_OSI_IN_BASEHI_IDX], integer_vars_[FMI_INTEGER_OSI_IN_BASELO_IDX]);
+        void* buffer = DecodeIntegerToPointer(integer_vars_[FMI_INTEGER_OSI_IN_BASEHI_IDX], integer_vars_[FMI_INTEGER_OSI_IN_BASELO_IDX]);
         NormalLog("OSMP", "Got %08X %08X, reading from %p ...", integer_vars_[FMI_INTEGER_OSI_IN_BASEHI_IDX], integer_vars_[FMI_INTEGER_OSI_IN_BASELO_IDX], buffer);
         data.ParseFromArray(buffer, integer_vars_[FMI_INTEGER_OSI_IN_SIZE_IDX]);
         return true;
@@ -119,25 +119,25 @@ fmi2Status OSMP::DoInit()
 {
 
     /* Booleans */
-    for (int &boolean_var : boolean_vars_)
+    for (int& boolean_var : boolean_vars_)
     {
         boolean_var = fmi2False;
     }
 
     /* Integers */
-    for (int &integer_var : integer_vars_)
+    for (int& integer_var : integer_vars_)
     {
         integer_var = 0;
     }
 
     /* Reals */
-    for (double &real_var : real_vars_)
+    for (double& real_var : real_vars_)
     {
         real_var = 0.0;
     }
 
     /* Strings */
-    for (auto &string_var : string_vars_)
+    for (auto& string_var : string_vars_)
     {
         string_var = "";
     }
@@ -157,26 +157,45 @@ fmi2Status OSMP::DoEnterInitializationMode()
 
 fmi2Status OSMP::DoExitInitializationMode()
 {
-    trace_file_writer_.Init(FmiTracePath(), FmiProtobufVersion(), FmiCustomName(), FmiType());
+    // get file format from parameter
+    std::string file_format_parameter = FmiFileFormat();
+    if (file_format_parameter.empty())
+    {
+        NormalLog("OSI", "No file format specified, assuming .osi as default");
+        file_format_parameter = "osi";
+    }
+    // Get lowercase format string
+    std::transform(file_format_parameter.begin(), file_format_parameter.end(), file_format_parameter.begin(), ::tolower);
+
+    // Remove leading dot if present
+    if (!file_format_parameter.empty() && file_format_parameter[0] == '.')
+    {
+        file_format_parameter.erase(0, 1);
+    }
+
+    // determine format using map
+    const std::map<std::string, FileFormat> FORMAT_MAP = {{"osi", FileFormat::OSI}, {"mcap", FileFormat::MCAP}, {"txth", FileFormat::TXTH}};
+    const auto format_map_it = FORMAT_MAP.find(file_format_parameter);
+    if (format_map_it == FORMAT_MAP.end())
+    {
+        std::cerr << "Unknown trace file format: " << FmiFileFormat() << std::endl;
+        return fmi2Error;
+    }
+    trace_file_writer_.Init(FmiTracePath(), FmiProtobufVersion(), FmiCustomName(), FmiMessageType(), format_map_it->second);
 
     return fmi2OK;
 }
 
 fmi2Status OSMP::DoCalc(fmi2Real current_communication_point, fmi2Real communication_step_size, fmi2Boolean no_set_fmu_state_prior_to_current_pointfmi_2_component)
 {
-
-    osi3::SensorData current_in;
-    if (GetFmiSensorDataIn(current_in))
+    if (const void* buffer = DecodeIntegerToPointer(integer_vars_[FMI_INTEGER_OSI_IN_BASEHI_IDX], integer_vars_[FMI_INTEGER_OSI_IN_BASELO_IDX]);
+        !trace_file_writer_.Step(buffer, integer_vars_[FMI_INTEGER_OSI_IN_SIZE_IDX]))
     {
-        osi3::SensorData current_out = trace_file_writer_.Step(current_in);
-        /* Serialize */
-        SetFmiValid(1);
-    } else
-    {
-        /* We have no valid input, so no valid output */
-        NormalLog("OSI", "No valid input, therefore providing no valid output.");
         SetFmiValid(0);
+        NormalLog("OSI", "Could not write to trace file.");
+        return fmi2Error;
     }
+    SetFmiValid(1);
     return fmi2OK;
 }
 
@@ -196,7 +215,7 @@ OSMP::OSMP(fmi2String theinstance_name,
            fmi2Type thefmu_type,
            fmi2String thefmu_guid,
            fmi2String thefmu_resource_location,
-           const fmi2CallbackFunctions *thefunctions,
+           const fmi2CallbackFunctions* thefunctions,
            fmi2Boolean thevisible,
            fmi2Boolean thelogging_on)
     : instance_name_(theinstance_name),
@@ -226,15 +245,18 @@ fmi2Status OSMP::SetDebugLogging(fmi2Boolean thelogging_on, size_t n_categories,
             if (0 == strcmp(categories[i], "FMI"))
             {
                 logging_categories_.insert("FMI");
-            } else if (0 == strcmp(categories[i], "OSMP"))
+            }
+            else if (0 == strcmp(categories[i], "OSMP"))
             {
                 logging_categories_.insert("OSMP");
-            } else if (0 == strcmp(categories[i], "OSI"))
+            }
+            else if (0 == strcmp(categories[i], "OSI"))
             {
                 logging_categories_.insert("OSI");
             }
         }
-    } else
+    }
+    else
     {
         logging_categories_.clear();
         logging_categories_.insert("FMI");
@@ -248,11 +270,11 @@ fmi2Component OSMP::Instantiate(fmi2String instance_name,
                                 fmi2Type fmu_type,
                                 fmi2String fmu_guid,
                                 fmi2String fmu_resource_location,
-                                const fmi2CallbackFunctions *functions,
+                                const fmi2CallbackFunctions* functions,
                                 fmi2Boolean visible,
                                 fmi2Boolean logging_on)
 {
-    auto *myc = new OSMP(instance_name, fmu_type, fmu_guid, fmu_resource_location, functions, visible, logging_on);
+    auto* myc = new OSMP(instance_name, fmu_type, fmu_guid, fmu_resource_location, functions, visible, logging_on);
 
     if (myc == nullptr)
     {
@@ -289,7 +311,7 @@ fmi2Component OSMP::Instantiate(fmi2String instance_name,
                         visible,
                         logging_on,
                         myc);
-    return (fmi2Component) myc;
+    return (fmi2Component)myc;
 }
 
 fmi2Status OSMP::SetupExperiment(fmi2Boolean tolerance_defined, fmi2Real tolerance, fmi2Real start_time, fmi2Boolean stop_time_defined, fmi2Real stop_time)
@@ -346,7 +368,8 @@ fmi2Status OSMP::GetReal(const fmi2ValueReference vr[], size_t nvr, fmi2Real val
         if (vr[i] < FMI_REAL_VARS)
         {
             value[i] = real_vars_[vr[i]];
-        } else
+        }
+        else
         {
             return fmi2Error;
         }
@@ -362,7 +385,8 @@ fmi2Status OSMP::GetInteger(const fmi2ValueReference vr[], size_t nvr, fmi2Integ
         if (vr[i] < FMI_INTEGER_VARS)
         {
             value[i] = integer_vars_[vr[i]];
-        } else
+        }
+        else
         {
             return fmi2Error;
         }
@@ -378,7 +402,8 @@ fmi2Status OSMP::GetBoolean(const fmi2ValueReference vr[], size_t nvr, fmi2Boole
         if (vr[i] < FMI_BOOLEAN_VARS)
         {
             value[i] = boolean_vars_[vr[i]];
-        } else
+        }
+        else
         {
             return fmi2Error;
         }
@@ -394,7 +419,8 @@ fmi2Status OSMP::GetString(const fmi2ValueReference vr[], size_t nvr, fmi2String
         if (vr[i] < FMI_STRING_VARS)
         {
             value[i] = string_vars_[vr[i]].c_str();
-        } else
+        }
+        else
         {
             return fmi2Error;
         }
@@ -410,7 +436,8 @@ fmi2Status OSMP::SetReal(const fmi2ValueReference vr[], size_t nvr, const fmi2Re
         if (vr[i] < FMI_REAL_VARS)
         {
             real_vars_[vr[i]] = value[i];
-        } else
+        }
+        else
         {
             return fmi2Error;
         }
@@ -426,7 +453,8 @@ fmi2Status OSMP::SetInteger(const fmi2ValueReference vr[], size_t nvr, const fmi
         if (vr[i] < FMI_INTEGER_VARS)
         {
             integer_vars_[vr[i]] = value[i];
-        } else
+        }
+        else
         {
             return fmi2Error;
         }
@@ -442,7 +470,8 @@ fmi2Status OSMP::SetBoolean(const fmi2ValueReference vr[], size_t nvr, const fmi
         if (vr[i] < FMI_BOOLEAN_VARS)
         {
             boolean_vars_[vr[i]] = value[i];
-        } else
+        }
+        else
         {
             return fmi2Error;
         }
@@ -458,7 +487,8 @@ fmi2Status OSMP::SetString(const fmi2ValueReference vr[], size_t nvr, const fmi2
         if (vr[i] < FMI_STRING_VARS)
         {
             string_vars_[vr[i]] = value[i];
-        } else
+        }
+        else
         {
             return fmi2Error;
         }
@@ -472,19 +502,19 @@ fmi2Status OSMP::SetString(const fmi2ValueReference vr[], size_t nvr, const fmi2
 
 extern "C" {
 
-FMI2_Export const char *fmi2GetTypesPlatform()
+FMI2_Export const char* fmi2GetTypesPlatform()
 {
     return fmi2TypesPlatform;
 }
 
-FMI2_Export const char *fmi2GetVersion()
+FMI2_Export const char* fmi2GetVersion()
 {
     return fmi2Version;
 }
 
 FMI2_Export fmi2Status fmi2SetDebugLogging(fmi2Component c, fmi2Boolean logging_on, size_t n_categories, const fmi2String categories[])
 {
-    auto *myc = (OSMP *) c;
+    auto* myc = (OSMP*)c;
     return myc->SetDebugLogging(logging_on, n_categories, categories);
 }
 
@@ -495,7 +525,7 @@ FMI2_Export fmi2Component fmi2Instantiate(fmi2String instance_name,
                                           fmi2Type fmu_type,
                                           fmi2String fmu_guid,
                                           fmi2String fmu_resource_location,
-                                          const fmi2CallbackFunctions *functions,
+                                          const fmi2CallbackFunctions* functions,
                                           fmi2Boolean visible,
                                           fmi2Boolean logging_on)
 {
@@ -505,19 +535,19 @@ FMI2_Export fmi2Component fmi2Instantiate(fmi2String instance_name,
 FMI2_Export fmi2Status
 fmi2SetupExperiment(fmi2Component c, fmi2Boolean tolerance_defined, fmi2Real tolerance, fmi2Real start_time, fmi2Boolean stop_time_defined, fmi2Real stop_time)
 {
-    auto *myc = (OSMP *) c;
+    auto* myc = (OSMP*)c;
     return myc->SetupExperiment(tolerance_defined, tolerance, start_time, stop_time_defined, stop_time);
 }
 
 FMI2_Export fmi2Status fmi2EnterInitializationMode(fmi2Component c)
 {
-    auto *myc = (OSMP *) c;
+    auto* myc = (OSMP*)c;
     return myc->EnterInitializationMode();
 }
 
 FMI2_Export fmi2Status fmi2ExitInitializationMode(fmi2Component c)
 {
-    auto *myc = (OSMP *) c;
+    auto* myc = (OSMP*)c;
     return myc->ExitInitializationMode();
 }
 
@@ -526,25 +556,25 @@ FMI2_Export fmi2Status fmi2DoStep(fmi2Component c,
                                   fmi2Real communication_step_size,
                                   fmi2Boolean no_set_fmu_state_prior_to_current_pointfmi2_component)
 {
-    auto *myc = (OSMP *) c;
+    auto* myc = (OSMP*)c;
     return myc->DoStep(current_communication_point, communication_step_size, no_set_fmu_state_prior_to_current_pointfmi2_component);
 }
 
 FMI2_Export fmi2Status fmi2Terminate(fmi2Component c)
 {
-    auto *myc = (OSMP *) c;
+    auto* myc = (OSMP*)c;
     return myc->Terminate();
 }
 
 FMI2_Export fmi2Status fmi2Reset(fmi2Component c)
 {
-    auto *myc = (OSMP *) c;
+    auto* myc = (OSMP*)c;
     return myc->Reset();
 }
 
 FMI2_Export void fmi2FreeInstance(fmi2Component c)
 {
-    auto *myc = (OSMP *) c;
+    auto* myc = (OSMP*)c;
     myc->FreeInstance();
     delete myc;
 }
@@ -554,56 +584,56 @@ FMI2_Export void fmi2FreeInstance(fmi2Component c)
  */
 FMI2_Export fmi2Status fmi2GetReal(fmi2Component c, const fmi2ValueReference vr[], size_t nvr, fmi2Real value[])
 {
-    auto *myc = (OSMP *) c;
+    auto* myc = (OSMP*)c;
     return myc->GetReal(vr, nvr, value);
 }
 
 FMI2_Export fmi2Status fmi2GetInteger(fmi2Component c, const fmi2ValueReference vr[], size_t nvr, fmi2Integer value[])
 {
-    auto *myc = (OSMP *) c;
+    auto* myc = (OSMP*)c;
     return myc->GetInteger(vr, nvr, value);
 }
 
 FMI2_Export fmi2Status fmi2GetBoolean(fmi2Component c, const fmi2ValueReference vr[], size_t nvr, fmi2Boolean value[])
 {
-    auto *myc = (OSMP *) c;
+    auto* myc = (OSMP*)c;
     return myc->GetBoolean(vr, nvr, value);
 }
 
 FMI2_Export fmi2Status fmi2GetString(fmi2Component c, const fmi2ValueReference vr[], size_t nvr, fmi2String value[])
 {
-    auto *myc = (OSMP *) c;
+    auto* myc = (OSMP*)c;
     return myc->GetString(vr, nvr, value);
 }
 
 FMI2_Export fmi2Status fmi2SetReal(fmi2Component c, const fmi2ValueReference vr[], size_t nvr, const fmi2Real value[])
 {
-    auto *myc = (OSMP *) c;
+    auto* myc = (OSMP*)c;
     return myc->SetReal(vr, nvr, value);
 }
 
 FMI2_Export fmi2Status fmi2SetInteger(fmi2Component c, const fmi2ValueReference vr[], size_t nvr, const fmi2Integer value[])
 {
-    auto *myc = (OSMP *) c;
+    auto* myc = (OSMP*)c;
     return myc->SetInteger(vr, nvr, value);
 }
 
 FMI2_Export fmi2Status fmi2SetBoolean(fmi2Component c, const fmi2ValueReference vr[], size_t nvr, const fmi2Boolean value[])
 {
-    auto *myc = (OSMP *) c;
+    auto* myc = (OSMP*)c;
     return myc->SetBoolean(vr, nvr, value);
 }
 
 FMI2_Export fmi2Status fmi2SetString(fmi2Component c, const fmi2ValueReference vr[], size_t nvr, const fmi2String value[])
 {
-    auto *myc = (OSMP *) c;
+    auto* myc = (OSMP*)c;
     return myc->SetString(vr, nvr, value);
 }
 
 /*
  * Unsupported Features (FMUState, Derivatives, Async DoStep, Status Enquiries)
  */
-FMI2_Export fmi2Status fmi2GetFMUstate(fmi2Component c, fmi2FMUstate *fmu_state)
+FMI2_Export fmi2Status fmi2GetFMUstate(fmi2Component c, fmi2FMUstate* fmu_state)
 {
     return fmi2Error;
 }
@@ -613,12 +643,12 @@ FMI2_Export fmi2Status fmi2SetFMUstate(fmi2Component c, fmi2FMUstate fmu_state)
     return fmi2Error;
 }
 
-FMI2_Export fmi2Status fmi2FreeFMUstate(fmi2Component c, fmi2FMUstate *fmu_state)
+FMI2_Export fmi2Status fmi2FreeFMUstate(fmi2Component c, fmi2FMUstate* fmu_state)
 {
     return fmi2Error;
 }
 
-FMI2_Export fmi2Status fmi2SerializedFMUstateSize(fmi2Component c, fmi2FMUstate fmu_state, size_t *size)
+FMI2_Export fmi2Status fmi2SerializedFMUstateSize(fmi2Component c, fmi2FMUstate fmu_state, size_t* size)
 {
     return fmi2Error;
 }
@@ -628,7 +658,7 @@ FMI2_Export fmi2Status fmi2SerializeFMUstate(fmi2Component c, fmi2FMUstate fmu_s
     return fmi2Error;
 }
 
-FMI2_Export fmi2Status fmi2DeSerializeFMUstate(fmi2Component c, const fmi2Byte serialized_state[], size_t size, fmi2FMUstate *fmu_state)
+FMI2_Export fmi2Status fmi2DeSerializeFMUstate(fmi2Component c, const fmi2Byte serialized_state[], size_t size, fmi2FMUstate* fmu_state)
 {
     return fmi2Error;
 }
@@ -659,27 +689,27 @@ FMI2_Export fmi2Status fmi2CancelStep(fmi2Component c)
     return fmi2OK;
 }
 
-FMI2_Export fmi2Status fmi2GetStatus(fmi2Component c, const fmi2StatusKind s, fmi2Status *value)
+FMI2_Export fmi2Status fmi2GetStatus(fmi2Component c, const fmi2StatusKind s, fmi2Status* value)
 {
     return fmi2Discard;
 }
 
-FMI2_Export fmi2Status fmi2GetRealStatus(fmi2Component c, const fmi2StatusKind s, fmi2Real *value)
+FMI2_Export fmi2Status fmi2GetRealStatus(fmi2Component c, const fmi2StatusKind s, fmi2Real* value)
 {
     return fmi2Discard;
 }
 
-FMI2_Export fmi2Status fmi2GetIntegerStatus(fmi2Component c, const fmi2StatusKind s, fmi2Integer *value)
+FMI2_Export fmi2Status fmi2GetIntegerStatus(fmi2Component c, const fmi2StatusKind s, fmi2Integer* value)
 {
     return fmi2Discard;
 }
 
-FMI2_Export fmi2Status fmi2GetBooleanStatus(fmi2Component c, const fmi2StatusKind s, fmi2Boolean *value)
+FMI2_Export fmi2Status fmi2GetBooleanStatus(fmi2Component c, const fmi2StatusKind s, fmi2Boolean* value)
 {
     return fmi2Discard;
 }
 
-FMI2_Export fmi2Status fmi2GetStringStatus(fmi2Component c, const fmi2StatusKind s, fmi2String *value)
+FMI2_Export fmi2Status fmi2GetStringStatus(fmi2Component c, const fmi2StatusKind s, fmi2String* value)
 {
     return fmi2Discard;
 }

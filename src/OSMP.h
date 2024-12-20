@@ -58,9 +58,10 @@
 #define FMI_STRING_TRACE_PATH_IDX 0
 #define FMI_STRING_PROTOBUF_VERSION_IDX 1
 #define FMI_STRING_CUSTOM_NAME_IDX 2
-#define FMI_STRING_TYPE_IDX 3
-#define FMI_STRING_LAST_IDX FMI_STRING_TYPE_IDX
-#define FMI_STRING_VARS (FMI_STRING_LAST_IDX+1)
+#define FMI_STRING_MESSAGE_TYPE_IDX 3
+#define FMI_STRING_FILE_FORMAT_IDX 4
+#define FMI_STRING_LAST_IDX FMI_STRING_FILE_FORMAT_IDX
+#define FMI_STRING_VARS (FMI_STRING_LAST_IDX + 1)
 
 #include <cstdarg>
 #include <fstream>
@@ -79,13 +80,13 @@ using namespace std;
 /* FMU Class */
 class OSMP
 {
- public:
+  public:
     /* FMI2 Interface mapped to C++ */
     OSMP(fmi2String theinstance_name,
          fmi2Type thefmu_type,
          fmi2String thefmu_guid,
          fmi2String thefmu_resource_location,
-         const fmi2CallbackFunctions *thefunctions,
+         const fmi2CallbackFunctions* thefunctions,
          fmi2Boolean thevisible,
          fmi2Boolean thelogging_on);
     fmi2Status SetDebugLogging(fmi2Boolean thelogging_on, size_t n_categories, const fmi2String categories[]);
@@ -93,7 +94,7 @@ class OSMP
                                      fmi2Type fmu_type,
                                      fmi2String fmu_guid,
                                      fmi2String fmu_resource_location,
-                                     const fmi2CallbackFunctions *functions,
+                                     const fmi2CallbackFunctions* functions,
                                      fmi2Boolean visible,
                                      fmi2Boolean logging_on);
     fmi2Status SetupExperiment(fmi2Boolean tolerance_defined, fmi2Real tolerance, fmi2Real start_time, fmi2Boolean stop_time_defined, fmi2Real stop_time);
@@ -112,7 +113,7 @@ class OSMP
     fmi2Status SetBoolean(const fmi2ValueReference vr[], size_t nvr, const fmi2Boolean value[]);
     fmi2Status SetString(const fmi2ValueReference vr[], size_t nvr, const fmi2String value[]);
 
- protected:
+  protected:
     /* Internal Implementation */
     fmi2Status DoInit();
     fmi2Status DoStart(fmi2Boolean tolerance_defined, fmi2Real tolerance, fmi2Real start_time, fmi2Boolean stop_time_defined, fmi2Real stop_time);
@@ -127,7 +128,7 @@ class OSMP
     static ofstream private_log_file;
 #endif
 
-    static void FmiVerboseLogGlobal(const char *format, ...)
+    static void FmiVerboseLogGlobal(const char* format, ...)
     {
 #ifdef VERBOSE_FMI_LOGGING
 #ifdef PRIVATE_LOG_PATH
@@ -151,7 +152,7 @@ class OSMP
 #endif
     }
 
-    void InternalLog(const char *category, const char *format, va_list arg)
+    void InternalLog(const char* category, const char* format, va_list arg)
     {
 #if defined(PRIVATE_LOG_PATH) || defined(PUBLIC_LOGGING)
         char buffer[1024];
@@ -177,7 +178,7 @@ class OSMP
 #endif
     }
 
-    void FmiVerboseLog(const char *format, ...)
+    void FmiVerboseLog(const char* format, ...)
     {
 #if defined(VERBOSE_FMI_LOGGING) && (defined(PRIVATE_LOG_PATH) || defined(PUBLIC_LOGGING))
         va_list ap;
@@ -188,7 +189,7 @@ class OSMP
     }
 
     /* Normal Logging */
-    void NormalLog(const char *category, const char *format, ...)
+    void NormalLog(const char* category, const char* format, ...)
     {
 #if defined(PRIVATE_LOG_PATH) || defined(PUBLIC_LOGGING)
         va_list ap;
@@ -198,7 +199,7 @@ class OSMP
 #endif
     }
 
- private:
+  private:
     /* Members */
     string instance_name_;
     fmi2Type fmu_type_;
@@ -217,35 +218,15 @@ class OSMP
     TraceFileWriter trace_file_writer_;
 
     /* Simple Accessors */
-    fmi2Boolean FmiValid()
-    {
-        return boolean_vars_[FMI_BOOLEAN_VALID_IDX];
-    }
-    void SetFmiValid(fmi2Boolean value)
-    {
-        boolean_vars_[FMI_BOOLEAN_VALID_IDX] = value;
-    }
-    string FmiTracePath()
-    {
-        return string_vars_[FMI_STRING_TRACE_PATH_IDX];
-    }
-    void SetFmiTracePath(string value)
-    {
-        string_vars_[FMI_STRING_TRACE_PATH_IDX] = value;
-    }
-    string FmiProtobufVersion()
-    {
-        return string_vars_[FMI_STRING_PROTOBUF_VERSION_IDX];
-    }
-    string FmiCustomName()
-    {
-        return string_vars_[FMI_STRING_CUSTOM_NAME_IDX];
-    }
-    string FmiType()
-    {
-        return string_vars_[FMI_STRING_TYPE_IDX];
-    }
+    fmi2Boolean FmiValid() { return boolean_vars_[FMI_BOOLEAN_VALID_IDX]; }
+    void SetFmiValid(fmi2Boolean value) { boolean_vars_[FMI_BOOLEAN_VALID_IDX] = value; }
+    string FmiTracePath() { return string_vars_[FMI_STRING_TRACE_PATH_IDX]; }
+    void SetFmiTracePath(string value) { string_vars_[FMI_STRING_TRACE_PATH_IDX] = value; }
+    string FmiProtobufVersion() { return string_vars_[FMI_STRING_PROTOBUF_VERSION_IDX]; }
+    string FmiCustomName() { return string_vars_[FMI_STRING_CUSTOM_NAME_IDX]; }
+    string FmiMessageType() { return string_vars_[FMI_STRING_MESSAGE_TYPE_IDX]; }
+    string FmiFileFormat() { return string_vars_[FMI_STRING_FILE_FORMAT_IDX]; }
 
     /* Protocol Buffer Accessors */
-    bool GetFmiSensorDataIn(osi3::SensorData &data);
+    bool GetFmiSensorDataIn(osi3::SensorData& data);
 };

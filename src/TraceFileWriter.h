@@ -7,35 +7,58 @@
 
 #pragma once
 
+#include <filesystem>
 #include <string>
+
+#include "osi-utilities/tracefile/Writer.h"
 #include "osi_sensordata.pb.h"
+
+enum class FileFormat : u_int8_t
+{
+    kUnknown = 0, /**< unknown file format (error */
+    MCAP,         /**< .mcap trace file format */
+    OSI,          /**< .osi trace file format*/
+    TXTH,         /**< .txth trace file format */
+};
 
 class TraceFileWriter
 {
- public:
-   void Init(std::string trace_path, std::string protobuf_version, std::string custom_name, std::string type);
-    osi3::SensorData Step(osi3::SensorData sensor_data);
-    void Term();
+  public:
+    void Init(const std::string& trace_path, std::string protobuf_version, std::string custom_name, std::string message_type, FileFormat file_format);
+    bool Step(const void* data, int size);
+    void Term() const;
 
- private:
+  private:
+    FileFormat file_format_ = FileFormat::kUnknown;
+    std::unique_ptr<osi3::TraceFileWriter> writer_;
+    std::function<bool(const void*, int)> serialized_writer_function_;
+    std::function<bool(const void*, int)> writer_function_consecutive_;
 
-    std::string trace_path_;
-    std::string trace_file_name_;
+    std::filesystem::path path_trace_folder_;
+    std::filesystem::path path_trace_temp_;
     std::string start_time_;
     int num_frames_ = 0;
     std::string osi_version_;
     std::string protobuf_version_;
     std::string custom_name_;
     std::string type_;
-
     void SetFileName();
+    void SetupDeserializedWriterFunction();
+    template <class T>
+    void setupForMessageType();
+    void SetupWriter();
+
+    const std::unordered_map<FileFormat, std::string> kFileNameMessageTypeMap = {{FileFormat::kUnknown, ".unknown"},
+                                                                                 {FileFormat::MCAP, ".mcap"},
+                                                                                 {FileFormat::OSI, ".osi"},
+                                                                                 {FileFormat::TXTH, ".txth"}};
 
     /* Private File-based Logging just for Debugging */
 #ifdef PRIVATE_LOG_PATH
     static ofstream private_log_file;
 #endif
 
-    static void FmiVerboseLogGlobal(const char *format, ...)
+    static void FmiVerboseLogGlobal(const char* format, ...)
     {
 #ifdef VERBOSE_FMI_LOGGING
 #ifdef PRIVATE_LOG_PATH
@@ -59,7 +82,7 @@ class TraceFileWriter
 #endif
     }
 
-    void InternalLog(const char *category, const char *format, va_list arg)
+    void InternalLog(const char* category, const char* format, va_list arg)
     {
 #if defined(PRIVATE_LOG_PATH) || defined(PUBLIC_LOGGING)
         char buffer[1024];
@@ -85,7 +108,7 @@ class TraceFileWriter
 #endif
     }
 
-    void FmiVerboseLog(const char *format, ...)
+    void FmiVerboseLog(const char* format, ...)
     {
 #if defined(VERBOSE_FMI_LOGGING) && (defined(PRIVATE_LOG_PATH) || defined(PUBLIC_LOGGING))
         va_list ap;
@@ -96,7 +119,7 @@ class TraceFileWriter
     }
 
     /* Normal Logging */
-    void NormalLog(const char *category, const char *format, ...)
+    void NormalLog(const char* category, const char* format, ...)
     {
 #if defined(PRIVATE_LOG_PATH) || defined(PUBLIC_LOGGING)
         va_list ap;
