@@ -7,24 +7,22 @@
 
 #include "TraceFileWriter.h"
 
+#include "filesystem"
 #include <ctime>
 #include <fstream>
 #include <utility>
-#include "filesystem"
 
+#include "osi-utilities/tracefile/writer/MCAPTraceFileWriter.h"
+#include "osi-utilities/tracefile/writer/SingleChannelBinaryTraceFileWriter.h"
+#include "osi-utilities/tracefile/writer/TXTHTraceFileWriter.h"
 #include "osi_sensordata.pb.h"
 #include "osi_sensorview.pb.h"
-
-#include "osi-utilities/tracefile/writer/SingleChannelBinaryTraceFileWriter.h"
-#include "osi-utilities/tracefile/writer/MCAPTraceFileWriter.h"
-#include "osi-utilities/tracefile/writer/TXTHTraceFileWriter.h"
-
 
 void TraceFileWriter::Init(const std::string& trace_path, std::string protobuf_version, std::string custom_name, std::string message_type, FileFormat file_format)
 {
     path_trace_folder_ = std::filesystem::path(trace_path);
     protobuf_version_ = std::move(protobuf_version);
-    custom_name_ = std::move(custom_name); // might be empty
+    custom_name_ = std::move(custom_name);  // might be empty
     type_ = std::move(message_type);
     file_format_ = file_format;
     SetFileName();
@@ -32,8 +30,7 @@ void TraceFileWriter::Init(const std::string& trace_path, std::string protobuf_v
     SetupDeserializedWriterFunction();
 }
 
-
-bool TraceFileWriter::Step(const void * data, int size)
+bool TraceFileWriter::Step(const void* data, int size)
 {
     num_frames_++;
     return serialized_writer_function_(data, size);
@@ -59,27 +56,32 @@ void TraceFileWriter::SetFileName()
     path_trace_temp_ = path_trace_folder_ / trace_file_name;
 }
 
-
-void TraceFileWriter::SetupDeserializedWriterFunction() {
-    if (type_ == "sv") {
+void TraceFileWriter::SetupDeserializedWriterFunction()
+{
+    if (type_ == "sv")
+    {
         setupForMessageType<osi3::SensorView>();
     }
-    else if (type_ == "sd") {
+    else if (type_ == "sd")
+    {
         setupForMessageType<osi3::SensorData>();
     }
-    else if (type_ == "gt") {
+    else if (type_ == "gt")
+    {
         setupForMessageType<osi3::GroundTruth>();
     }
-    else {
+    else
+    {
         throw std::runtime_error("Unknown message type: " + type_);
     }
 }
 
-template<typename T>
-void TraceFileWriter::setupForMessageType() {
-    if (file_format_ == FileFormat::MCAP) {
+template <typename T>
+void TraceFileWriter::setupForMessageType()
+{
+    if (file_format_ == FileFormat::MCAP)
+    {
         auto mcap_writer = dynamic_cast<osi3::MCAPTraceFileWriter*>(writer_.get());
-
 
         writer_function_consecutive_ = [mcap_writer](const void* data, int size) {
             T msg;
@@ -87,7 +89,8 @@ void TraceFileWriter::setupForMessageType() {
             return mcap_writer->WriteMessage(msg, "sl-5-6-osi-trace-file-writer");
         };
     }
-    else if (file_format_ == FileFormat::OSI) {
+    else if (file_format_ == FileFormat::OSI)
+    {
         auto binary_writer = dynamic_cast<osi3::SingleChannelBinaryTraceFileWriter*>(writer_.get());
         writer_function_consecutive_ = [binary_writer](const void* data, int size) {
             T msg;
@@ -95,7 +98,8 @@ void TraceFileWriter::setupForMessageType() {
             return binary_writer->WriteMessage(msg);
         };
     }
-    else if (file_format_ == FileFormat::TXTH) {
+    else if (file_format_ == FileFormat::TXTH)
+    {
         auto txth_writer = dynamic_cast<osi3::TXTHTraceFileWriter*>(writer_.get());
         writer_function_consecutive_ = [txth_writer](const void* data, int size) {
             T msg;
@@ -118,7 +122,8 @@ void TraceFileWriter::setupForMessageType() {
             auto mcap_writer = dynamic_cast<osi3::MCAPTraceFileWriter*>(writer_.get());
             std::unordered_map<std::string, std::string> channel_metadata = {
                 {"net.asam.osi.trace.channel.description", "Channel added via openMSL sl-5-6-osi-trace-file-writer"},
-                {"net.asam.osi.trace.channel.osi_version", // in the current implementation of asam-osi-utilities this will be overwritten. This must be changed in the asam-osi-utilities library
+                {"net.asam.osi.trace.channel.osi_version",  // in the current implementation of asam-osi-utilities this will be overwritten. This must be changed in the
+                                                            // asam-osi-utilities library
                  std::to_string(version.version_major()) + "." + std::to_string(version.version_minor()) + "." + std::to_string(version.version_patch())}};
             mcap_writer->AddChannel("sl-5-6-osi-trace-file-writer", T::descriptor(), channel_metadata);
         }
@@ -130,40 +135,39 @@ void TraceFileWriter::setupForMessageType() {
     };
 }
 
-
 void TraceFileWriter::SetupWriter()
 {
-    if (file_format_ == FileFormat::MCAP) {
-            auto writer = std::make_unique<osi3::MCAPTraceFileWriter>();
-            writer->Open(path_trace_temp_);
-            writer->AddFileMetadata(osi3::MCAPTraceFileWriter::PrepareRequiredFileMetadata());
-            writer_ = std::move(writer);
-        }
+    if (file_format_ == FileFormat::MCAP)
+    {
+        auto writer = std::make_unique<osi3::MCAPTraceFileWriter>();
+        writer->Open(path_trace_temp_);
+        writer->AddFileMetadata(osi3::MCAPTraceFileWriter::PrepareRequiredFileMetadata());
+        writer_ = std::move(writer);
+    }
     else if (file_format_ == FileFormat::OSI)
-        {
-            auto writer = std::make_unique<osi3::SingleChannelBinaryTraceFileWriter>();
-            writer->Open(path_trace_temp_);
-            writer_ = std::move(writer);
-        }
+    {
+        auto writer = std::make_unique<osi3::SingleChannelBinaryTraceFileWriter>();
+        writer->Open(path_trace_temp_);
+        writer_ = std::move(writer);
+    }
     else if (file_format_ == FileFormat::TXTH)
-        {
-            auto writer = std::make_unique<osi3::TXTHTraceFileWriter>();
-            writer->Open(path_trace_temp_);
-            writer_ = std::move(writer);
-        }
+    {
+        auto writer = std::make_unique<osi3::TXTHTraceFileWriter>();
+        writer->Open(path_trace_temp_);
+        writer_ = std::move(writer);
+    }
     else
     {
-    throw std::runtime_error("Unknown file format");
+        throw std::runtime_error("Unknown file format");
     }
 }
-
 
 void TraceFileWriter::Term() const
 {
     writer_->Close();
 
     // rename file based on number of frames
-    std::filesystem::path path_trace_final_ = path_trace_folder_ /( start_time_ + "_" + type_ + "_" + osi_version_ + "_" + protobuf_version_ + "_" + std::to_string(num_frames_));
+    std::filesystem::path path_trace_final_ = path_trace_folder_ / (start_time_ + "_" + type_ + "_" + osi_version_ + "_" + protobuf_version_ + "_" + std::to_string(num_frames_));
     if (!custom_name_.empty())
     {
         path_trace_final_ += "_" + custom_name_;
