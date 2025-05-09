@@ -9,13 +9,14 @@ the [OSI Sensor Model Packaging (OSMP)](https://github.com/OpenSimulationInterfa
 
 ## FMI Parameters
 
-| Parameter        | Description                                                                                                                                                                                                                                                               |
-|------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| trace_path       | Path, where to put the generated trace file                                                                                                                                                                                                                               |
+| Parameter       | Description                                                                                                                                                                                                                                                               |
+|-----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| trace_path      | Path, where to put the generated trace file                                                                                                                                                                                                                               |
 | protobuf_version | Protobuf version, with which the OSI messages are serialized as string, e.g. "2112" for v21.12 (see [Naming Convention](https://opensimulationinterface.github.io/osi-antora-generator/asamosi/latest/interface/architecture/trace_file_naming.html))                     |
-| custom_name      | Custom name as a suffix for the trace file name (see [Naming Convention](https://opensimulationinterface.github.io/osi-antora-generator/asamosi/latest/interface/architecture/trace_file_naming.html))                                                                    |
-| message_type     | OSI message type string according to the [Naming Convention](https://opensimulationinterface.github.io/osi-antora-generator/asamosi/latest/interface/architecture/trace_file_naming.html). <br>Currently supports: SensorData (sd), SensorView (sv), and GroundTruth (gt) |
-| file_format      | Format of the output trace file. Allowed values: mcap, osi, or txth                                                                                                                                                                                                       |
+| custom_name     | Custom name as a suffix for the trace file name (see [Naming Convention](https://opensimulationinterface.github.io/osi-antora-generator/asamosi/latest/interface/architecture/trace_file_naming.html))                                                                    |
+| message_type    | OSI message type string according to the [Naming Convention](https://opensimulationinterface.github.io/osi-antora-generator/asamosi/latest/interface/architecture/trace_file_naming.html). <br>Currently supports: SensorData (sd), SensorView (sv), and GroundTruth (gt) |
+| file_format     | Format of the output trace file. Allowed values: mcap, osi, or txth                                                                                                                                                                                                       |
+| omit_timestamp  | Bool to disable set of actual timestamp. If omit_timestamp is true, the timestamp is set to 00000000T000000Z.                                                                                                                                                             |
 
 ## Installation
 
