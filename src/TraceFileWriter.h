@@ -24,7 +24,7 @@ enum class FileFormat : u_int8_t
 class TraceFileWriter
 {
   public:
-    void Init(const std::string& trace_path, std::string protobuf_version, std::string custom_name, std::string message_type, FileFormat file_format);
+    void Init(const std::string& trace_path, std::string protobuf_version, std::string custom_name, std::string message_type, FileFormat file_format, bool omit_timestamp);
     bool Step(const void* data, int size);
     void Term() const;
 
@@ -36,6 +36,7 @@ class TraceFileWriter
 
     std::filesystem::path path_trace_folder_;
     std::filesystem::path path_trace_temp_;
+    bool omit_timestamp_;
     std::string start_time_;
     int num_frames_ = 0;
     std::string osi_version_;
