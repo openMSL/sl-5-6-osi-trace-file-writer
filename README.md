@@ -16,7 +16,7 @@ the [OSI Sensor Model Packaging (OSMP)](https://github.com/OpenSimulationInterfa
 | custom_name     | Custom name as a suffix for the trace file name (see [Naming Convention](https://opensimulationinterface.github.io/osi-antora-generator/asamosi/latest/interface/architecture/trace_file_naming.html))                                                                    |
 | message_type    | OSI message type string according to the [Naming Convention](https://opensimulationinterface.github.io/osi-antora-generator/asamosi/latest/interface/architecture/trace_file_naming.html). <br>Currently supports: SensorData (sd), SensorView (sv), and GroundTruth (gt) |
 | file_format     | Format of the output trace file. Allowed values: mcap, osi, or txth                                                                                                                                                                                                       |
-| omit_timestamp  | Bool to disable set of actual timestamp. If omit_timestamp is true, the timestamp is set to 00000000T000000Z.                                                                                                                                                             |
+| omit_timestamp  | Bool to disable setting the actual timestamp. If omit_timestamp is true, the timestamp is set to 00000000T000000Z.                                                                                                                                                             |
 
 ## Installation
 
