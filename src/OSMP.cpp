@@ -142,6 +142,8 @@ fmi2Status OSMP::DoInit()
         string_var = "";
     }
 
+    SetFmiOmitTimestamp(false);
+
     return fmi2OK;
 }
 
@@ -181,7 +183,7 @@ fmi2Status OSMP::DoExitInitializationMode()
         std::cerr << "Unknown trace file format: " << FmiFileFormat() << std::endl;
         return fmi2Error;
     }
-    trace_file_writer_.Init(FmiTracePath(), FmiProtobufVersion(), FmiCustomName(), FmiMessageType(), format_map_it->second);
+    trace_file_writer_.Init(FmiTracePath(), FmiProtobufVersion(), FmiCustomName(), FmiMessageType(), format_map_it->second, FmiOmitTimestamp());
 
     return fmi2OK;
 }

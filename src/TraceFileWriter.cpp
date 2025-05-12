@@ -18,8 +18,9 @@
 #include "osi_sensordata.pb.h"
 #include "osi_sensorview.pb.h"
 
-void TraceFileWriter::Init(const std::string& trace_path, std::string protobuf_version, std::string custom_name, std::string message_type, FileFormat file_format)
+void TraceFileWriter::Init(const std::string& trace_path, std::string protobuf_version, std::string custom_name, std::string message_type, FileFormat file_format, bool omit_timestamp)
 {
+    omit_timestamp_ = omit_timestamp;
     path_trace_folder_ = std::filesystem::path(trace_path);
     protobuf_version_ = std::move(protobuf_version);
     custom_name_ = std::move(custom_name);  // might be empty
@@ -43,7 +44,11 @@ void TraceFileWriter::SetFileName()
     time(&curr_time);
     const tm* date_time = localtime(&curr_time);
     strftime(buf, 20, "%Y%m%dT%H%M%SZ", date_time);
-    start_time_ = std::string(buf);
+    if (omit_timestamp_) {
+        start_time_ = "00000000T000000Z";
+    } else {
+        start_time_ = std::string(buf);
+    }
 
     auto trace_file_name = start_time_ + "_" + type_;
     if (!custom_name_.empty())

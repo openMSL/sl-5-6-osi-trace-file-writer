@@ -48,6 +48,9 @@
     <ScalarVariable name="valid" valueReference="0" causality="output" variability="discrete" initial="exact">
       <Boolean start="false"/>
     </ScalarVariable>
+    <ScalarVariable name="omit_timestamp" valueReference="1" causality="parameter" variability="fixed">
+      <Boolean start="false"/>
+    </ScalarVariable>
     <ScalarVariable name="trace_path" valueReference="0" causality="parameter" variability="fixed">
       <String start=""/>
     </ScalarVariable>
