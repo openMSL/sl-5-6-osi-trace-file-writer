@@ -39,7 +39,8 @@
 
 /* Boolean Variables */
 #define FMI_BOOLEAN_VALID_IDX 0
-#define FMI_BOOLEAN_LAST_IDX FMI_BOOLEAN_VALID_IDX
+#define FMI_BOOLEAN_OMIT_TIMESTAMP_IDX 1
+#define FMI_BOOLEAN_LAST_IDX FMI_BOOLEAN_OMIT_TIMESTAMP_IDX
 #define FMI_BOOLEAN_VARS (FMI_BOOLEAN_LAST_IDX + 1)
 
 /* Integer Variables */
@@ -220,6 +221,8 @@ class OSMP
     /* Simple Accessors */
     fmi2Boolean FmiValid() { return boolean_vars_[FMI_BOOLEAN_VALID_IDX]; }
     void SetFmiValid(fmi2Boolean value) { boolean_vars_[FMI_BOOLEAN_VALID_IDX] = value; }
+    fmi2Boolean FmiOmitTimestamp() { return boolean_vars_[FMI_BOOLEAN_OMIT_TIMESTAMP_IDX]; }
+    void SetFmiOmitTimestamp(fmi2Boolean value) { boolean_vars_[FMI_BOOLEAN_OMIT_TIMESTAMP_IDX] = value; }
     string FmiTracePath() { return string_vars_[FMI_STRING_TRACE_PATH_IDX]; }
     void SetFmiTracePath(string value) { string_vars_[FMI_STRING_TRACE_PATH_IDX] = value; }
     string FmiProtobufVersion() { return string_vars_[FMI_STRING_PROTOBUF_VERSION_IDX]; }
